@@ -53,5 +53,4 @@ public class SearchResult implements Serializable {
         }
         return results;
     }
-
 }

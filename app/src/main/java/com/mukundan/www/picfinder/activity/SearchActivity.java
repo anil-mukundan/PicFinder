@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ public class SearchActivity extends ActionBarActivity {
     private GridView gvResults;
     private List<SearchResult> images;
     private SearchResultAdapter aSearchResults;
+    private String currentQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,14 @@ public class SearchActivity extends ActionBarActivity {
         images = new ArrayList<>();
         aSearchResults = new SearchResultAdapter(this, images);
         gvResults.setAdapter(aSearchResults);
+        gvResults.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                Log.d("Page", Integer.toString(page));
+                loadImages(page);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -55,13 +65,15 @@ public class SearchActivity extends ActionBarActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchForImages(query);
+                currentQuery = query;
+                searchForImages();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchForImages(newText);
+                currentQuery = newText;
+                searchForImages();
                 return false;
             }
         });
@@ -86,21 +98,36 @@ public class SearchActivity extends ActionBarActivity {
         }
     }
 
+    public void searchForImages() {
+        loadImages(0);
+    }
 
-    public void searchForImages(String query) {
-
+    public void loadImages(int startPageIndex) {
+        if (startPageIndex == 0) {
+            aSearchResults.clear();
+        }
+        if (startPageIndex > 63) {
+            Toast.makeText(this, "Reached Max Images", Toast.LENGTH_LONG).show();
+            return;
+        }
         AsyncHttpClient httpClient = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("v", "1.0");
         params.put("rsz", "8");
-        params.put("q", query);
+        params.put("q", currentQuery);
+        if (startPageIndex > 0) {
+            params.put("start", Integer.toString(startPageIndex));
+        }
         httpClient.get(this.IMAGE_SEARCH_URL, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                aSearchResults.clear();
                 aSearchResults.addAll(SearchResult.parse(response));
             }
         });
+    }
+
+    public void loadMoreImages() {
+        AsyncHttpClient httpClient = new AsyncHttpClient();
     }
 
     private void setupViews() {
