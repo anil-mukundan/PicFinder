@@ -30,10 +30,16 @@ import cz.msebera.android.httpclient.Header;
 public class SearchActivity extends ActionBarActivity {
 
     private static final String IMAGE_SEARCH_URL = "https://ajax.googleapis.com/ajax/services/search/images";
+    private static final int FILTER_REQUEST_CODE = 0;
+    private static final String ALL = "all";
     private GridView gvResults;
     private List<SearchResult> images;
     private SearchResultAdapter aSearchResults;
     private String currentQuery;
+    private String imageSize = ALL;
+    private String imageType = ALL;
+    private String colorFilter = ALL;
+    private String siteFilter = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +96,7 @@ public class SearchActivity extends ActionBarActivity {
 
         switch (id) {
             case R.id.action_filter:
-                Toast.makeText(this, "Filter", Toast.LENGTH_SHORT).show();
+                showAdvancedFilters();
                 return true;
 
             default:
@@ -106,7 +112,7 @@ public class SearchActivity extends ActionBarActivity {
         if (startPageIndex == 0) {
             aSearchResults.clear();
         }
-        if (startPageIndex > 63) {
+        if (startPageIndex > 64) {
             Toast.makeText(this, "Reached Max Images", Toast.LENGTH_LONG).show();
             return;
         }
@@ -115,6 +121,18 @@ public class SearchActivity extends ActionBarActivity {
         params.put("v", "1.0");
         params.put("rsz", "8");
         params.put("q", currentQuery);
+        if (!imageSize.equals(ALL)) {
+            params.put("imgsz", imageSize);
+        }
+        if (!imageType.equals(ALL)) {
+            params.put("imgtype", imageType);
+        }
+        if (!colorFilter.equals(ALL)) {
+            params.put("imgcolor", colorFilter);
+        }
+        if (!siteFilter.isEmpty()) {
+            params.put("as_sitesearch", siteFilter);
+        }
         if (startPageIndex > 0) {
             params.put("start", Integer.toString(startPageIndex));
         }
@@ -126,8 +144,26 @@ public class SearchActivity extends ActionBarActivity {
         });
     }
 
-    public void loadMoreImages() {
-        AsyncHttpClient httpClient = new AsyncHttpClient();
+    private void showAdvancedFilters() {
+        Intent i = new Intent(SearchActivity.this, SearchFilterActivity.class);
+        i.putExtra("image_type", this.imageType);
+        i.putExtra("image_size", this.imageSize);
+        i.putExtra("color_filter", this.colorFilter);
+        i.putExtra("site_filter", this.siteFilter);
+        startActivityForResult(i, FILTER_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == FILTER_REQUEST_CODE) {
+            this.imageType = data.getExtras().getString("image_type");
+            this.imageSize = data.getExtras().getString("image_size");
+            this.colorFilter = data.getExtras().getString("color_filter");
+            this.siteFilter = data.getExtras().getString("site_filter");
+
+            this.searchForImages();
+        }
     }
 
     private void setupViews() {

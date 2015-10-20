@@ -14,17 +14,20 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.ImageDisplayActivity"
-            android:label="@string/title_activity_image_display"
+            android:label="@string/app_name"
             android:parentActivityName=".activity.SearchActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mukundan.www.picfinder.activity.SearchActivity" />
+        </activity>
+        <activity
+            android:name=".activity.SearchFilterActivity"
+            android:label="@string/app_name" >
         </activity>
     </application>
 
