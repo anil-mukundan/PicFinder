@@ -39,23 +39,23 @@ public class SearchFilterActivity extends ActionBarActivity {
     }
 
     private void setupViews() {
+        this.etImageSize = (Spinner) findViewById(R.id.etImageSize);
+        ArrayAdapter<CharSequence> aImageSize = ArrayAdapter.createFromResource(this,
+                R.array.image_size, android.R.layout.simple_spinner_item);
+        aImageSize.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        etImageSize.setAdapter(aImageSize);
+
         this.etColorFilter = (Spinner) findViewById(R.id.etColorFilter);
         ArrayAdapter<CharSequence> aColorFilter = ArrayAdapter.createFromResource(this,
                 R.array.color_filter, android.R.layout.simple_spinner_item);
         aColorFilter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         etColorFilter.setAdapter(aColorFilter);
 
-        this.etImageSize = (Spinner) findViewById(R.id.etImageSize);
-        ArrayAdapter<CharSequence> aImageSize = ArrayAdapter.createFromResource(this,
-                R.array.image_size, android.R.layout.simple_spinner_item);
-        aImageSize.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        etColorFilter.setAdapter(aImageSize);
-
         this.etImageType = (Spinner) findViewById(R.id.etImageType);
         ArrayAdapter<CharSequence> aImageType = ArrayAdapter.createFromResource(this,
                 R.array.image_type, android.R.layout.simple_spinner_item);
         aImageType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        etColorFilter.setAdapter(aImageType);
+        etImageType.setAdapter(aImageType);
 
         this.etSiteFilter = (EditText) findViewById(R.id.etSiteFilter);
 
@@ -64,8 +64,8 @@ public class SearchFilterActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Intent data = new Intent();
-                data.putExtra("image_size", "all"); //etImageSize.getSelectedItem().toString());
-                data.putExtra("image_type", "all"); //etImageType.getSelectedItem().toString());
+                data.putExtra("image_size", etImageSize.getSelectedItem().toString());
+                data.putExtra("image_type", etImageType.getSelectedItem().toString());
                 data.putExtra("color_filter", etColorFilter.getSelectedItem().toString());
                 data.putExtra("site_filter", etSiteFilter.getText().toString());
                 data.putExtra("code", 200); // ints work too
